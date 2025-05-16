@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.denysmb.klaro</id>
+
+  <name>Klaro</name>
+  <summary>Simple and fast translation app for KDE Plasma</summary>
+
+  <developer id="io.github.denysmb">
+    <name>Denys Madureira</name>
+  </developer>
+
+  <launchable type="desktop-id">io.github.denysmb.klaro.desktop</launchable>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#ee8ca8</color>
+    <color type="primary" scheme_preference="dark">#fbd696</color>
+  </branding>
+
+  <description>
+    <p>
+      ...
+    </p>
+  </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>...</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/DenysMb/Klaro</url>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="0.1.0" date="2025-05-16">
+      <description>
+        <p>Initial release.</p>
+      </description>
+    </release>
+  </releases>
+</component>

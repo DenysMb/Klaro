@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Klaro
+Comment=Simple and fast translation app for KDE Plasma
+Version=1.0
+Exec=Klaro
+Icon=io.github.denysmb.klaro
+Type=Application
+Terminal=false
+Categories=Qt;KDE;
