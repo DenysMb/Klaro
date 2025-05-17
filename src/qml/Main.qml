@@ -60,6 +60,31 @@ Kirigami.ApplicationWindow {
                 onTriggered: translateText()
             },
             Kirigami.Action {
+                text: i18n("Switch languages")
+                icon.name: "exchange-positions"
+                enabled: selectedInputLanguage !== i18n("Auto detect")
+                onTriggered: {
+                    // Don't switch if input is "Auto detect"
+                    if (selectedInputLanguage === i18n("Auto detect")) {
+                        return;
+                    }
+                    
+                    // Store current values
+                    let tempInput = selectedInputLanguage;
+                    let tempOutput = selectedOutputLanguage;
+                    let tempInputText = inputTextArea.text;
+                    let tempOutputText = translatedTextLabel.text;
+                    
+                    // Switch languages
+                    selectedInputLanguage = tempOutput;
+                    selectedOutputLanguage = tempInput;
+                    
+                    // Switch texts
+                    inputTextArea.text = tempOutputText;
+                    translatedTextLabel.text = tempInputText;
+                }
+            },
+            Kirigami.Action {
                 separator: true
             },
             Kirigami.Action {
@@ -140,6 +165,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: i18n("Switch languages")
                 icon.name: "exchange-positions"
+                enabled: selectedInputLanguage !== i18n("Auto detect")
                 onTriggered: {
                     // Don't switch if input is "Auto detect"
                     if (selectedInputLanguage === i18n("Auto detect")) {
