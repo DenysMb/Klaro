@@ -32,6 +32,7 @@ public:
     void setOutputLanguage(const QString &language);
 
     Q_INVOKABLE QString translate(const QString &text, const QString &fromLang, const QString &toLang);
+    Q_INVOKABLE bool copyToClipboard(const QString &text);
 
 Q_SIGNALS:
     void availableLanguagesChanged();

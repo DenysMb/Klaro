@@ -3,6 +3,8 @@
 #include <KLocalizedString>
 #include <QRegularExpression>
 #include <QSettings>
+#include <QClipboard>
+#include <QGuiApplication>
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -167,4 +169,19 @@ void TranslationManager::saveSettings()
     settings.setValue(QStringLiteral("translation/inputLanguage"), m_inputLanguage);
     settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
     settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
+}
+
+bool TranslationManager::copyToClipboard(const QString &text)
+{
+    if (text.isEmpty()) {
+        return false;
+    }
+    
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    if (!clipboard) {
+        return false;
+    }
+    
+    clipboard->setText(text);
+    return true;
 } 

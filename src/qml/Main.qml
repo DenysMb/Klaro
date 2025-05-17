@@ -208,6 +208,22 @@ Kirigami.ApplicationWindow {
                 }
             }
 
+            Controls.ToolButton {
+                anchors {
+                    top: translatedCard.top
+                    right: translatedCard.right
+                    margins: Kirigami.Units.smallSpacing
+                }
+                icon.name: "edit-copy"
+                text: i18n("Copy")
+                display: Controls.ToolButton.IconOnly
+                visible: translatedTextLabel.text !== ""
+                onClicked: {
+                    // Copy text to clipboard
+                    TranslationManager.copyToClipboard(translatedTextLabel.text)
+                }
+            }
+
             // Input area - for user to enter text to translate
             Kirigami.AbstractCard {
                 id: inputCard
