@@ -1,5 +1,6 @@
 #include "translationmanager.h"
 #include <QDebug>
+#include <KLocalizedString>
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -37,7 +38,7 @@ void TranslationManager::fetchAvailableLanguages()
         QString output = QString::fromUtf8(m_process->readAllStandardOutput());
         m_availableLanguages = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
         // Add "Auto detect" as the first option
-        m_availableLanguages.prepend(QStringLiteral("auto"));
+        m_availableLanguages.prepend(i18n("Auto detect"));
         Q_EMIT availableLanguagesChanged();
     } else {
         qDebug() << "Error fetching languages:" << m_process->errorString();

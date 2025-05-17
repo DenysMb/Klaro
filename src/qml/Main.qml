@@ -83,8 +83,16 @@ Kirigami.ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Kirigami.FormData.label: i18n("Output Language:")
-                model: TranslationManager.availableLanguages.filter(function(lang) { return lang !== "auto" })
-                currentIndex: 0
+                model: TranslationManager.availableLanguages.filter(function(lang) { return lang !== i18n("Auto detect") })
+                Component.onCompleted: {
+                    // Find and set the English index
+                    for (let i = 0; i < model.length; i++) {
+                        if (model[i].toLowerCase() === "english") {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                }
                 popup.height: Math.min(popup.contentItem.implicitHeight, root.height / 2)
             }
         }
