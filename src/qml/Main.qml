@@ -21,6 +21,34 @@ Kirigami.ApplicationWindow {
     // and provides additional context for the translators
     title: i18nc("@title:window", "Klaro")
     
+    globalDrawer: Kirigami.GlobalDrawer {
+        isMenu: true
+        actions: [
+            Kirigami.Action {
+                text: i18n("Change language")
+                icon.name: "languages"
+                onTriggered: languageDialog.open()
+            },
+            Kirigami.Action {
+                text: i18n("Translate")
+                icon.name: "translate"
+                onTriggered: {
+                    // Translation logic goes here
+                }
+            },
+            Kirigami.Action {
+                separator: true
+            },
+            Kirigami.Action {
+                text: i18n("Use English language names")
+                icon.name: "preferences-desktop-locale"
+                checkable: true
+                checked: TranslationManager.useEnglishNames
+                onTriggered: TranslationManager.useEnglishNames = checked
+            }
+        ]
+    }
+
     // Language dialog component
     Kirigami.Dialog {
         id: languageDialog

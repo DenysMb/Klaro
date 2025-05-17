@@ -13,9 +13,24 @@ QStringList TranslationManager::availableLanguages() const
     return m_availableLanguages;
 }
 
+bool TranslationManager::useEnglishNames() const
+{
+    return m_useEnglishNames;
+}
+
+void TranslationManager::setUseEnglishNames(bool value)
+{
+    if (m_useEnglishNames != value) {
+        m_useEnglishNames = value;
+        Q_EMIT useEnglishNamesChanged();
+        fetchAvailableLanguages();
+    }
+}
+
 void TranslationManager::fetchAvailableLanguages()
 {
-    m_process->start(QStringLiteral("trans"), QStringList() << QStringLiteral("-list-languages"));
+    QString command = m_useEnglishNames ? QStringLiteral("-list-languages-english") : QStringLiteral("-list-languages");
+    m_process->start(QStringLiteral("trans"), QStringList() << command);
     m_process->waitForFinished();
 
     if (m_process->exitCode() == 0) {
