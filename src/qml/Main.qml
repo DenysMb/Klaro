@@ -138,6 +138,30 @@ Kirigami.ApplicationWindow {
         // Add actions to the page header
         actions: [
             Kirigami.Action {
+                text: i18n("Switch languages")
+                icon.name: "exchange-positions"
+                onTriggered: {
+                    // Don't switch if input is "Auto detect"
+                    if (selectedInputLanguage === i18n("Auto detect")) {
+                        return;
+                    }
+                    
+                    // Store current values
+                    let tempInput = selectedInputLanguage;
+                    let tempOutput = selectedOutputLanguage;
+                    let tempInputText = inputTextArea.text;
+                    let tempOutputText = translatedTextLabel.text;
+                    
+                    // Switch languages
+                    selectedInputLanguage = tempOutput;
+                    selectedOutputLanguage = tempInput;
+                    
+                    // Switch texts
+                    inputTextArea.text = tempOutputText;
+                    translatedTextLabel.text = tempInputText;
+                }
+            },
+            Kirigami.Action {
                 text: i18n("Change language")
                 icon.name: "languages"
                 onTriggered: {
