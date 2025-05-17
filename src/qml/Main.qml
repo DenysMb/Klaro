@@ -12,6 +12,9 @@ Kirigami.ApplicationWindow {
     width: 600
     height: 500
 
+    property string selectedInputLanguage: i18n("Auto detect")
+    property string selectedOutputLanguage: "English"
+
     // Window title
     // i18nc() makes a string translatable
     // and provides additional context for the translators
@@ -26,9 +29,8 @@ Kirigami.ApplicationWindow {
         preferredWidth: Kirigami.Units.gridUnit * 20
         
         onAccepted: {
-            // Apply language selections
-            console.log("Input language: " + inputLanguageComboBox.currentText)
-            console.log("Output language: " + outputLanguageComboBox.currentText)
+            root.selectedInputLanguage = inputLanguageComboBox.currentText
+            root.selectedOutputLanguage = outputLanguageComboBox.currentText
             // Here you would update your app's language settings
         }
         
@@ -40,7 +42,7 @@ Kirigami.ApplicationWindow {
                 id: inputLanguageComboBox
                 Layout.fillWidth: true
                 Kirigami.FormData.label: i18n("Input Language:")
-                model: ["English", "Spanish", "French", "German", "Chinese", "Japanese"]
+                model: [i18n("Auto detect"), "English", "Spanish", "French", "German", "Chinese", "Japanese"]
             }
             
             // Output language selection
@@ -133,5 +135,8 @@ Kirigami.ApplicationWindow {
                 }
             }
         }
+
+        // Header displaying selected languages
+        title: root.selectedInputLanguage + " -> " + root.selectedOutputLanguage
     }
 }
