@@ -191,7 +191,6 @@ Kirigami.ApplicationWindow {
                     id: inputTextArea
                     width: parent.width
                     height: parent.height / 2 - Kirigami.Units.largeSpacing
-                    placeholderText: i18n("Enter text to translate")
                     wrapMode: TextEdit.Wrap
                     background: null
                     opacity: text === "" ? 0.6 : 1.0
