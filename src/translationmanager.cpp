@@ -2,12 +2,14 @@
 #include <QDebug>
 #include <KLocalizedString>
 #include <QRegularExpression>
+#include <QSettings>
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
     , m_process(new QProcess(this))
 {
     fetchAvailableLanguages();
+    loadSettings();
 }
 
 QStringList TranslationManager::availableLanguages() const
@@ -121,4 +123,48 @@ void TranslationManager::fetchAvailableLanguages()
         qDebug() << "Error fetching languages:" << m_process->errorString();
         qDebug() << "Error output:" << QString::fromUtf8(m_process->readAllStandardError());
     }
+}
+
+QString TranslationManager::inputLanguage() const
+{
+    return m_inputLanguage;
+}
+
+void TranslationManager::setInputLanguage(const QString &language)
+{
+    if (m_inputLanguage != language) {
+        m_inputLanguage = language;
+        saveSettings();
+        Q_EMIT inputLanguageChanged();
+    }
+}
+
+QString TranslationManager::outputLanguage() const
+{
+    return m_outputLanguage;
+}
+
+void TranslationManager::setOutputLanguage(const QString &language)
+{
+    if (m_outputLanguage != language) {
+        m_outputLanguage = language;
+        saveSettings();
+        Q_EMIT outputLanguageChanged();
+    }
+}
+
+void TranslationManager::loadSettings()
+{
+    QSettings settings;
+    m_inputLanguage = settings.value(QStringLiteral("translation/inputLanguage"), i18n("Auto detect")).toString();
+    m_outputLanguage = settings.value(QStringLiteral("translation/outputLanguage"), QStringLiteral("English")).toString();
+    m_useEnglishNames = settings.value(QStringLiteral("translation/useEnglishNames"), false).toBool();
+}
+
+void TranslationManager::saveSettings()
+{
+    QSettings settings;
+    settings.setValue(QStringLiteral("translation/inputLanguage"), m_inputLanguage);
+    settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
+    settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
 } 

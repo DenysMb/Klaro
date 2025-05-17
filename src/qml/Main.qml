@@ -13,14 +13,17 @@ Kirigami.ApplicationWindow {
     width: 600
     height: 500
 
-    property string selectedInputLanguage: i18n("Auto detect")
-    property string selectedOutputLanguage: "English"
+    property string selectedInputLanguage: TranslationManager.inputLanguage
+    property string selectedOutputLanguage: TranslationManager.outputLanguage
 
     Component.onCompleted: {
-        // Set initial values
-        selectedInputLanguage = i18n("Auto detect")
-        selectedOutputLanguage = "English"
+        // Initial values will be loaded from settings
+        selectedInputLanguage = TranslationManager.inputLanguage
+        selectedOutputLanguage = TranslationManager.outputLanguage
     }
+
+    onSelectedInputLanguageChanged: TranslationManager.inputLanguage = selectedInputLanguage
+    onSelectedOutputLanguageChanged: TranslationManager.outputLanguage = selectedOutputLanguage
 
     function translateText() {
         if (inputTextArea.text.trim() === "") {
