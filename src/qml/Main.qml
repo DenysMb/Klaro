@@ -109,17 +109,27 @@ Kirigami.ApplicationWindow {
             }
 
             // Input area - for user to enter text to translate
-            Controls.TextArea {
-                id: inputTextArea
+            Kirigami.AbstractCard {
+                id: inputCard
                 width: parent.width
                 height: parent.height / 2 - Kirigami.Units.largeSpacing
-                placeholderText: i18n("Enter text to translate")
-                wrapMode: TextEdit.Wrap
-                background: Rectangle {
-                    color: Kirigami.Theme.backgroundColor
-                    border.color: Kirigami.Theme.disabledTextColor
-                    border.width: 1
-                    radius: 4
+                
+                contentItem: Controls.TextArea {
+                    id: inputTextArea
+                    width: parent.width
+                    height: parent.height / 2 - Kirigami.Units.largeSpacing
+                    placeholderText: i18n("Enter text to translate")
+                    wrapMode: TextEdit.Wrap
+                    background: null
+                    opacity: text === "" ? 0.6 : 1.0
+
+                    // Show placeholder text when empty
+                    Kirigami.PlaceholderMessage {
+                        anchors.centerIn: parent
+                        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                        visible: inputTextArea.text === ""
+                        text: i18n("Enter text to translate")
+                    }
                 }
             }
         }
