@@ -16,6 +16,12 @@ Kirigami.ApplicationWindow {
     property string selectedInputLanguage: i18n("Auto detect")
     property string selectedOutputLanguage: "English"
 
+    Component.onCompleted: {
+        // Set initial values
+        selectedInputLanguage = i18n("Auto detect")
+        selectedOutputLanguage = "English"
+    }
+
     // Window title
     // i18nc() makes a string translatable
     // and provides additional context for the translators
@@ -57,10 +63,31 @@ Kirigami.ApplicationWindow {
         padding: Kirigami.Units.largeSpacing
         preferredWidth: Kirigami.Units.gridUnit * 20
         
+        onOpened: {
+            // Set initial values when dialog opens
+            for (let i = 0; i < inputLanguageComboBox.model.length; i++) {
+                if (inputLanguageComboBox.model[i] === root.selectedInputLanguage) {
+                    inputLanguageComboBox.currentIndex = i;
+                    break;
+                }
+            }
+            for (let i = 0; i < outputLanguageComboBox.model.length; i++) {
+                if (outputLanguageComboBox.model[i] === root.selectedOutputLanguage) {
+                    outputLanguageComboBox.currentIndex = i;
+                    break;
+                }
+            }
+        }
+        
         onAccepted: {
             root.selectedInputLanguage = inputLanguageComboBox.currentText
             root.selectedOutputLanguage = outputLanguageComboBox.currentText
-            // Here you would update your app's language settings
+        }
+
+        onRejected: {
+            // Reset to the last accepted values
+            inputLanguageComboBox.currentIndex = inputLanguageComboBox.model.indexOf(root.selectedInputLanguage)
+            outputLanguageComboBox.currentIndex = outputLanguageComboBox.model.indexOf(root.selectedOutputLanguage)
         }
         
         Kirigami.FormLayout {
@@ -73,7 +100,6 @@ Kirigami.ApplicationWindow {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Kirigami.FormData.label: i18n("Input Language:")
                 model: TranslationManager.availableLanguages
-                currentIndex: 0  // Set to "auto" by default
                 popup.height: Math.min(popup.contentItem.implicitHeight, root.height / 2)
             }
             
@@ -84,15 +110,6 @@ Kirigami.ApplicationWindow {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Kirigami.FormData.label: i18n("Output Language:")
                 model: TranslationManager.availableLanguages.filter(function(lang) { return lang !== i18n("Auto detect") })
-                Component.onCompleted: {
-                    // Find and set the English index
-                    for (let i = 0; i < model.length; i++) {
-                        if (model[i].toLowerCase() === "english") {
-                            currentIndex = i;
-                            break;
-                        }
-                    }
-                }
                 popup.height: Math.min(popup.contentItem.implicitHeight, root.height / 2)
             }
         }
