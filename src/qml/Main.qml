@@ -22,6 +22,22 @@ Kirigami.ApplicationWindow {
         selectedOutputLanguage = "English"
     }
 
+    function translateText() {
+        if (inputTextArea.text.trim() === "") {
+            return;
+        }
+        
+        let result = TranslationManager.translate(
+            inputTextArea.text,
+            root.selectedInputLanguage,
+            root.selectedOutputLanguage
+        );
+        
+        if (result) {
+            translatedTextLabel.text = result;
+        }
+    }
+
     // Window title
     // i18nc() makes a string translatable
     // and provides additional context for the translators
@@ -38,9 +54,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: i18n("Translate")
                 icon.name: "translate"
-                onTriggered: {
-                    // Translation logic goes here
-                }
+                onTriggered: translateText()
             },
             Kirigami.Action {
                 separator: true
@@ -131,9 +145,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: i18n("Translate")
                 icon.name: "translate"
-                onTriggered: {
-                    // Translation logic goes here
-                }
+                onTriggered: translateText()
             }
         ]
 
@@ -144,7 +156,6 @@ Kirigami.ApplicationWindow {
             spacing: Kirigami.Units.largeSpacing
 
             // Output area - displays translated text (not editable)
-            // Now using Kirigami.AbstractCard instead of TextArea
             Kirigami.AbstractCard {
                 id: translatedCard
                 width: parent.width
@@ -184,6 +195,13 @@ Kirigami.ApplicationWindow {
                     wrapMode: TextEdit.Wrap
                     background: null
                     opacity: text === "" ? 0.6 : 1.0
+
+                    Keys.onReturnPressed: {
+                        if (event.modifiers === Qt.NoModifier) {
+                            translateText()
+                            event.accepted = true
+                        }
+                    }
 
                     // Show placeholder text when empty
                     Kirigami.PlaceholderMessage {
