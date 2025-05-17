@@ -13,3 +13,4 @@ CMakeUserPresets.json
 build
 .flatpak-builder
 builddir
+.vscode

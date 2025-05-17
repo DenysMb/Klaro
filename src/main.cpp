@@ -6,6 +6,7 @@
 #include <KLocalizedContext>
 #include <KLocalizedString>
 #include <KIconTheme>
+#include "translationmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +24,10 @@ int main(int argc, char *argv[])
     }
 
     QQmlApplicationEngine engine;
+
+    // Register TranslationManager with QML
+    qmlRegisterSingletonInstance("io.github.denysmb.klaro", 1, 0, "TranslationManager",
+                                new TranslationManager(&engine));
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.loadFromModule("io.github.denysmb.klaro", "Main");

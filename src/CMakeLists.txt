@@ -11,6 +11,8 @@ ecm_add_qml_module(klaro
 target_sources(klaro
     PRIVATE
     main.cpp
+    translationmanager.cpp
+    translationmanager.h
 )
 
 ecm_target_qml_sources(klaro

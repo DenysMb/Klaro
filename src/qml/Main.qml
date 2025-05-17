@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import io.github.denysmb.klaro 1.0
 
 // Provides basic features needed for all kirigami applications
 Kirigami.ApplicationWindow {
@@ -41,16 +42,22 @@ Kirigami.ApplicationWindow {
             Controls.ComboBox {
                 id: inputLanguageComboBox
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Kirigami.FormData.label: i18n("Input Language:")
-                model: [i18n("Auto detect"), "English", "Spanish", "French", "German", "Chinese", "Japanese"]
+                model: TranslationManager.availableLanguages
+                currentIndex: 0  // Set to "auto" by default
+                popup.height: Math.min(popup.contentItem.implicitHeight, root.height / 2)
             }
             
             // Output language selection
             Controls.ComboBox {
                 id: outputLanguageComboBox
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Kirigami.FormData.label: i18n("Output Language:")
-                model: ["English", "Spanish", "French", "German", "Chinese", "Japanese"]
+                model: TranslationManager.availableLanguages.filter(function(lang) { return lang !== "auto" })
+                currentIndex: 0
+                popup.height: Math.min(popup.contentItem.implicitHeight, root.height / 2)
             }
         }
     }
