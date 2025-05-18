@@ -6,4 +6,4 @@ Exec=klaro
 Icon=io.github.denysmb.klaro
 Type=Application
 Terminal=false
-Categories=Qt;KDE;
+Categories=Utility
