@@ -23,7 +23,12 @@ Kirigami.ApplicationWindow {
     }
 
     onSelectedInputLanguageChanged: TranslationManager.inputLanguage = selectedInputLanguage
-    onSelectedOutputLanguageChanged: TranslationManager.outputLanguage = selectedOutputLanguage
+    onSelectedOutputLanguageChanged: {
+        // Only translate if we have text and the output language changed
+        if (inputTextArea.text.trim() !== "") {
+            translateText()
+        }
+    }
 
     function translateText() {
         if (inputTextArea.text.trim() === "") {
