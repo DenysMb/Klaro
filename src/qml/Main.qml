@@ -271,7 +271,12 @@ Kirigami.ApplicationWindow {
                     opacity: text === "" ? 0.6 : 1.0
 
                     Keys.onReturnPressed: {
-                        if (event.modifiers === Qt.NoModifier) {
+                        if (event.modifiers === Qt.ShiftModifier) {
+                            // Insert a new line when Shift+Enter is pressed
+                            inputTextArea.insert(inputTextArea.cursorPosition, "\n")
+                            event.accepted = true
+                        } else if (event.modifiers === Qt.NoModifier) {
+                            // Translate when Enter is pressed without modifiers
                             translateText()
                             event.accepted = true
                         }
