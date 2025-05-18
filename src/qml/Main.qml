@@ -216,7 +216,8 @@ Kirigami.ApplicationWindow {
                 
                 contentItem: Controls.Label {
                     id: translatedTextLabel
-                    anchors.fill: parent
+                    width: parent.width
+                    height: parent.height
                     anchors.margins: Kirigami.Units.smallSpacing
                     text: ""
                     wrapMode: Text.WordWrap

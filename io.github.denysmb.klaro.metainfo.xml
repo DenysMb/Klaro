@@ -14,6 +14,12 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
+  <categories>
+    <category>Utility</category>
+    <category>Translation</category>
+    <category>KDE</category>
+  </categories>
+
   <branding>
     <color type="primary" scheme_preference="light">#ee8ca8</color>
     <color type="primary" scheme_preference="dark">#fbd696</color>
@@ -21,13 +27,13 @@
 
   <description>
     <p>
-      ...
+      A simple and fast translation app for KDE Plasma that helps you translate text between different languages.
     </p>
   </description>
 
   <screenshots>
     <screenshot type="default">
-      <image>...</image>
+      <image>https://i.imgur.com/lOi6r6i.png</image>
     </screenshot>
   </screenshots>
 
@@ -36,7 +42,7 @@
   <content_rating type="oars-1.1" />
 
   <releases>
-    <release version="0.1.0" date="2025-05-16">
+    <release version="1.0.0" date="2025-05-18">
       <description>
         <p>Initial release.</p>
       </description>

@@ -2,7 +2,7 @@
 Name=Klaro
 Comment=Simple and fast translation app for KDE Plasma
 Version=1.0
-Exec=Klaro
+Exec=klaro
 Icon=io.github.denysmb.klaro
 Type=Application
 Terminal=false
