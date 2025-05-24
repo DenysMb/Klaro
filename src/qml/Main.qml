@@ -24,6 +24,7 @@ Kirigami.ApplicationWindow {
 
     onSelectedInputLanguageChanged: TranslationManager.inputLanguage = selectedInputLanguage
     onSelectedOutputLanguageChanged: {
+        TranslationManager.outputLanguage = selectedOutputLanguage
         // Only translate if we have text and the output language changed
         if (inputTextArea.text.trim() !== "") {
             translateText()

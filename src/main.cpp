@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     KIconTheme::initTheme();
     QApplication app(argc, argv);
     KLocalizedString::setApplicationDomain("klaro");
-    QApplication::setOrganizationName(QStringLiteral("io.github.denysmb"));
+    QApplication::setOrganizationName(QStringLiteral("klaro"));
     QApplication::setOrganizationDomain(QStringLiteral("io.github.denysmb"));
     QApplication::setApplicationName(QStringLiteral("Klaro"));
     QApplication::setDesktopFileName(QStringLiteral("io.github.denysmb.klaro"));

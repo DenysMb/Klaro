@@ -9,8 +9,7 @@
       "--socket=fallback-x11",
       "--socket=wayland",
       "--device=dri",
-      "--share=network",
-      "--filesystem=xdg-config/klaro:create"
+      "--share=network"
   ],
   "modules": [
       {

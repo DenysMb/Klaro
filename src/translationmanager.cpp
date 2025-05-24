@@ -5,6 +5,8 @@
 #include <QSettings>
 #include <QClipboard>
 #include <QGuiApplication>
+#include <QStandardPaths>
+#include <QDir>
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -28,6 +30,7 @@ void TranslationManager::setUseEnglishNames(bool value)
 {
     if (m_useEnglishNames != value) {
         m_useEnglishNames = value;
+        saveSettings();  // Save the setting when it changes
         Q_EMIT useEnglishNamesChanged();
         
         // Update the available languages list with new names
@@ -157,18 +160,55 @@ void TranslationManager::setOutputLanguage(const QString &language)
 
 void TranslationManager::loadSettings()
 {
-    QSettings settings;
+    // Create the config directory if it doesn't exist
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    QDir dir(configDir);
+    if (!dir.exists(QStringLiteral("klaro"))) {
+        dir.mkpath(QStringLiteral("klaro"));
+    }
+    
+    // Use explicit file path to ensure Flatpak compatibility
+    QString settingsPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QStringLiteral("/klaro/settings.conf");
+    QSettings settings(settingsPath, QSettings::IniFormat);
+    
+    qDebug() << QStringLiteral("Loading settings from:") << settingsPath;
+    
     m_inputLanguage = settings.value(QStringLiteral("translation/inputLanguage"), i18n("Auto detect")).toString();
     m_outputLanguage = settings.value(QStringLiteral("translation/outputLanguage"), QStringLiteral("English")).toString();
     m_useEnglishNames = settings.value(QStringLiteral("translation/useEnglishNames"), false).toBool();
+    
+    qDebug() << QStringLiteral("Loaded settings - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage << QStringLiteral("useEnglishNames:") << m_useEnglishNames;
 }
 
 void TranslationManager::saveSettings()
 {
-    QSettings settings;
+    // Create the config directory if it doesn't exist
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    QDir dir(configDir);
+    if (!dir.exists(QStringLiteral("klaro"))) {
+        dir.mkpath(QStringLiteral("klaro"));
+    }
+    
+    // Use explicit file path to ensure Flatpak compatibility
+    QString settingsPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QStringLiteral("/klaro/settings.conf");
+    QSettings settings(settingsPath, QSettings::IniFormat);
+    
+    qDebug() << QStringLiteral("Saving settings to:") << settingsPath;
+    
     settings.setValue(QStringLiteral("translation/inputLanguage"), m_inputLanguage);
     settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
     settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
+    
+    // Force sync to ensure data is written immediately
+    settings.sync();
+    
+    qDebug() << QStringLiteral("Settings saved - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage << QStringLiteral("useEnglishNames:") << m_useEnglishNames;
+    
+    // Check if sync was successful
+    if (settings.status() != QSettings::NoError) {
+        qWarning() << QStringLiteral("Failed to save settings. Status:") << settings.status();
+        qWarning() << QStringLiteral("Attempted to save to:") << settingsPath;
+    }
 }
 
 bool TranslationManager::copyToClipboard(const QString &text)
