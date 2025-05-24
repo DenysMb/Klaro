@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the Klaro package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Klaro 1.0.0\n"
