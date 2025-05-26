@@ -100,7 +100,7 @@ msgstr "Kopiëren"
 #: src/qml/Main.qml:291
 #, kde-format
 msgid "Enter text to translate"
-msgstr "Voer hier de te vertalen tekst is"
+msgstr "Voer hier de te vertalen tekst in"
 
 #: src/translationmanager.cpp:74
 #, kde-format
