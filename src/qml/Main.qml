@@ -16,10 +16,14 @@ Kirigami.ApplicationWindow {
     property string selectedInputLanguage: TranslationManager.inputLanguage
     property string selectedOutputLanguage: TranslationManager.outputLanguage
 
+    function countWords(text) {
+        return text.trim() === "" ? 0 : text.trim().split(/\s+/).length
+    }
+
     Component.onCompleted: {
-        // Initial values will be loaded from settings
         selectedInputLanguage = TranslationManager.inputLanguage
         selectedOutputLanguage = TranslationManager.outputLanguage
+        inputTextArea.forceActiveFocus()
     }
 
     onSelectedInputLanguageChanged: TranslationManager.inputLanguage = selectedInputLanguage
@@ -252,9 +256,20 @@ Kirigami.ApplicationWindow {
                 display: Controls.ToolButton.IconOnly
                 visible: translatedTextLabel.text !== ""
                 onClicked: {
-                    // Copy text to clipboard
                     TranslationManager.copyToClipboard(translatedTextLabel.text)
                 }
+            }
+
+            Controls.Label {
+                anchors {
+                    bottom: translatedCard.bottom
+                    right: translatedCard.right
+                    margins: Kirigami.Units.smallSpacing
+                }
+                visible: translatedTextLabel.text !== ""
+                text: translatedTextLabel.text.length + " chars · " + root.countWords(translatedTextLabel.text) + " words"
+                opacity: 0.6
+                font: Kirigami.Theme.smallFont
             }
 
             // Input area - for user to enter text to translate
@@ -291,6 +306,33 @@ Kirigami.ApplicationWindow {
                         text: i18n("Enter text to translate")
                     }
                 }
+            }
+
+            Controls.ToolButton {
+                anchors {
+                    top: inputCard.top
+                    right: inputCard.right
+                    margins: Kirigami.Units.smallSpacing
+                }
+                icon.name: "edit-clear"
+                text: i18n("Clear")
+                display: Controls.ToolButton.IconOnly
+                visible: inputTextArea.text !== ""
+                onClicked: {
+                    inputTextArea.text = ""
+                }
+            }
+
+            Controls.Label {
+                anchors {
+                    bottom: inputCard.bottom
+                    right: inputCard.right
+                    margins: Kirigami.Units.smallSpacing
+                }
+                visible: inputTextArea.text !== ""
+                text: inputTextArea.text.length + " chars · " + root.countWords(inputTextArea.text) + " words"
+                opacity: 0.6
+                font: Kirigami.Theme.smallFont
             }
         }
 
