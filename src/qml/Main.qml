@@ -15,6 +15,8 @@ Kirigami.ApplicationWindow {
 
     property string selectedInputLanguage: TranslationManager.inputLanguage
     property string selectedOutputLanguage: TranslationManager.outputLanguage
+    property var translationSegments: []
+    property bool alternativesExpanded: false
 
     function countWords(text) {
         return text.trim() === "" ? 0 : text.trim().split(/\s+/).length
@@ -40,14 +42,15 @@ Kirigami.ApplicationWindow {
             return;
         }
         
-        let result = TranslationManager.translate(
+        let result = TranslationManager.translateDetailed(
             inputTextArea.text,
             root.selectedInputLanguage,
             root.selectedOutputLanguage
         );
         
-        if (result) {
-            translatedTextLabel.text = result;
+        if (result.translation) {
+            translatedTextLabel.text = result.translation;
+            root.translationSegments = result.segments;
         }
     }
 
@@ -92,6 +95,7 @@ Kirigami.ApplicationWindow {
                     // Switch texts
                     inputTextArea.text = tempOutputText;
                     translatedTextLabel.text = tempInputText;
+                    root.translationSegments = [];
                 }
             },
             Kirigami.Action {
@@ -212,30 +216,31 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: i18n("Switch languages")
                 icon.name: "exchange-positions"
-                enabled: selectedInputLanguage !== i18n("Auto detect")
-                onTriggered: {
-                    // Don't switch if input is "Auto detect"
-                    if (selectedInputLanguage === i18n("Auto detect")) {
-                        return;
-                    }
-                    
-                    // Store current values
-                    let tempInput = selectedInputLanguage;
-                    let tempOutput = selectedOutputLanguage;
-                    let tempInputText = inputTextArea.text;
-                    let tempOutputText = translatedTextLabel.text;
-                    
-                    // Switch languages
-                    selectedInputLanguage = tempOutput;
-                    selectedOutputLanguage = tempInput;
-                    
-                    // Switch texts
-                    inputTextArea.text = tempOutputText;
-                    translatedTextLabel.text = tempInputText;
+            enabled: selectedInputLanguage !== i18n("Auto detect")
+            onTriggered: {
+                // Don't switch if input is "Auto detect"
+                if (selectedInputLanguage === i18n("Auto detect")) {
+                    return;
                 }
-            },
-            Kirigami.Action {
-                text: i18n("Change language")
+                
+                // Store current values
+                let tempInput = selectedInputLanguage;
+                let tempOutput = selectedOutputLanguage;
+                let tempInputText = inputTextArea.text;
+                let tempOutputText = translatedTextLabel.text;
+                
+                // Switch languages
+                selectedInputLanguage = tempOutput;
+                selectedOutputLanguage = tempInput;
+                
+                // Switch texts
+                inputTextArea.text = tempOutputText;
+                translatedTextLabel.text = tempInputText;
+                root.translationSegments = [];
+            }
+        },
+        Kirigami.Action {
+            text: i18n("Change language")
                 icon.name: "languages"
                 onTriggered: {
                     // Open the language selection dialog
@@ -261,23 +266,63 @@ Kirigami.ApplicationWindow {
                 width: parent.width
                 height: parent.height / 2 - Kirigami.Units.largeSpacing
                 
-                contentItem: Controls.Label {
-                    id: translatedTextLabel
-                    width: parent.width
-                    height: parent.height
-                    anchors.margins: Kirigami.Units.smallSpacing
-                    text: ""
-                    wrapMode: Text.WordWrap
-                    elide: Text.ElideRight
-                    verticalAlignment: Text.AlignTop
-                    opacity: text === "" ? 0.6 : 1.0
-                    
-                    // Show placeholder text when empty
-                    Kirigami.PlaceholderMessage {
-                        anchors.centerIn: parent
-                        width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                        visible: translatedTextLabel.text === ""
-                        text: i18n("Translated text will appear here")
+                contentItem: ColumnLayout {
+                    anchors.fill: parent
+                    spacing: Kirigami.Units.smallSpacing
+
+                    Controls.Label {
+                        id: translatedTextLabel
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        text: ""
+                        wrapMode: Text.WordWrap
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignTop
+                        opacity: text === "" ? 0.6 : 1.0
+                        
+                        // Show placeholder text when empty
+                        Kirigami.PlaceholderMessage {
+                            anchors.centerIn: parent
+                            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                            visible: translatedTextLabel.text === ""
+                            text: i18n("Translated text will appear here")
+                        }
+                    }
+
+                    Controls.ToolButton {
+                        Layout.fillWidth: true
+                        visible: root.translationSegments.length > 0
+                        text: i18n("Alternatives")
+                        icon.name: root.alternativesExpanded ? "go-up" : "go-down"
+                        onClicked: root.alternativesExpanded = !root.alternativesExpanded
+                    }
+
+                    ListView {
+                        id: alternativesList
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Math.min(contentHeight, parent.height / 2)
+                        visible: root.alternativesExpanded && root.translationSegments.length > 0
+                        clip: true
+                        model: root.translationSegments
+                        spacing: Kirigami.Units.smallSpacing
+
+                        delegate: Column {
+                            width: alternativesList.width
+
+                            Controls.Label {
+                                width: parent.width
+                                text: modelData.segment
+                                wrapMode: Text.WordWrap
+                                font.bold: true
+                            }
+                            Controls.Label {
+                                width: parent.width
+                                leftPadding: Kirigami.Units.largeSpacing
+                                text: modelData.alternatives.join(", ")
+                                wrapMode: Text.WordWrap
+                                opacity: 0.7
+                            }
+                        }
                     }
                 }
             }

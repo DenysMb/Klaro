@@ -104,6 +104,69 @@ QString TranslationManager::translate(const QString &text, const QString &fromLa
     }
 }
 
+QVariantMap TranslationManager::translateDetailed(const QString &text, const QString &fromLang, const QString &toLang)
+{
+    QVariantMap result;
+    QString translation = translate(text, fromLang, toLang);
+    result.insert(QStringLiteral("translation"), translation);
+
+    QVariantList segments;
+    if (!translation.isEmpty() && (m_translationEngine == QStringLiteral("google") || m_translationEngine == QStringLiteral("auto"))) {
+        segments = fetchSegments(text, fromLang, toLang);
+    }
+    result.insert(QStringLiteral("segments"), segments);
+    return result;
+}
+
+QVariantList TranslationManager::fetchSegments(const QString &text, const QString &fromLang, const QString &toLang)
+{
+    QVariantList segments;
+    QString fromCode = getLanguageCode(fromLang);
+    QString toCode = getLanguageCode(toLang);
+
+    if (toCode.isEmpty()) {
+        return segments;
+    }
+
+    QStringList args;
+    args << QStringLiteral("-e") << m_translationEngine;
+    if (fromLang == i18n("Auto detect")) {
+        args << QStringLiteral(":%1").arg(toCode);
+    } else {
+        args << QStringLiteral("%1:%2").arg(fromCode, toCode);
+    }
+    args << text << QStringLiteral("-no-ansi") << QStringLiteral("-show-original") << QStringLiteral("n") << QStringLiteral("-show-original-phonetics")
+         << QStringLiteral("n") << QStringLiteral("-show-translation") << QStringLiteral("n") << QStringLiteral("-show-translation-phonetics")
+         << QStringLiteral("n") << QStringLiteral("-show-prompt-message") << QStringLiteral("n") << QStringLiteral("-show-languages") << QStringLiteral("n")
+         << QStringLiteral("-show-original-dictionary") << QStringLiteral("n");
+
+    QProcess process;
+    process.start(QStringLiteral("trans"), args);
+    process.waitForFinished();
+
+    if (process.exitCode() != 0) {
+        return segments;
+    }
+
+    QString output = QString::fromUtf8(process.readAllStandardOutput());
+    const QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    for (const QString &line : lines) {
+        if (line.startsWith(QLatin1String("    "))) {
+            if (!segments.isEmpty()) {
+                QVariantMap last = segments.last().toMap();
+                last[QStringLiteral("alternatives")] = line.trimmed().split(QStringLiteral(", "), Qt::SkipEmptyParts);
+                segments.last() = last;
+            }
+        } else {
+            QVariantMap entry;
+            entry[QStringLiteral("segment")] = line;
+            entry[QStringLiteral("alternatives")] = QStringList();
+            segments.append(entry);
+        }
+    }
+    return segments;
+}
+
 void TranslationManager::fetchAvailableLanguages()
 {
     m_process->start(QStringLiteral("trans"), QStringList() << QStringLiteral("-list-all"));

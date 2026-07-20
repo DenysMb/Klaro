@@ -1,10 +1,12 @@
 #ifndef TRANSLATIONMANAGER_H
 #define TRANSLATIONMANAGER_H
 
+#include <QMap>
 #include <QObject>
 #include <QProcess>
 #include <QStringList>
-#include <QMap>
+#include <QVariantList>
+#include <QVariantMap>
 
 class TranslationManager : public QObject
 {
@@ -35,6 +37,7 @@ public:
     void setTranslationEngine(const QString &engine);
 
     Q_INVOKABLE QString translate(const QString &text, const QString &fromLang, const QString &toLang);
+    Q_INVOKABLE QVariantMap translateDetailed(const QString &text, const QString &fromLang, const QString &toLang);
     Q_INVOKABLE bool copyToClipboard(const QString &text);
 
 Q_SIGNALS:
@@ -47,6 +50,7 @@ Q_SIGNALS:
 
 private:
     void fetchAvailableLanguages();
+    QVariantList fetchSegments(const QString &text, const QString &fromLang, const QString &toLang);
     QString getLanguageCode(const QString &languageName) const;
     void loadSettings();
     void saveSettings();
