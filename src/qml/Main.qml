@@ -42,15 +42,20 @@ Kirigami.ApplicationWindow {
             return;
         }
         
-        let result = TranslationManager.translateDetailed(
+        TranslationManager.translateDetailed(
             inputTextArea.text,
             root.selectedInputLanguage,
             root.selectedOutputLanguage
         );
-        
-        if (result.translation) {
-            translatedTextLabel.text = result.translation;
-            root.translationSegments = result.segments;
+    }
+
+    Connections {
+        target: TranslationManager
+        function onTranslationFinished(result) {
+            if (result.translation) {
+                translatedTextLabel.text = result.translation;
+                root.translationSegments = result.segments;
+            }
         }
     }
 
@@ -340,6 +345,14 @@ Kirigami.ApplicationWindow {
                 onClicked: {
                     TranslationManager.copyToClipboard(translatedTextLabel.text)
                 }
+            }
+
+            Controls.BusyIndicator {
+                anchors.centerIn: translatedCard
+                implicitWidth: Kirigami.Units.gridUnit * 3
+                implicitHeight: Kirigami.Units.gridUnit * 3
+                visible: TranslationManager.busy
+                running: visible
             }
 
             Controls.Label {

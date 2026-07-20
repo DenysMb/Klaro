@@ -67,88 +67,68 @@ QString TranslationManager::getLanguageCode(const QString &languageName) const
     return QString();
 }
 
-QString TranslationManager::translate(const QString &text, const QString &fromLang, const QString &toLang)
+bool TranslationManager::busy() const
+{
+    return m_busy;
+}
+
+void TranslationManager::setBusy(bool busy)
+{
+    if (m_busy != busy) {
+        m_busy = busy;
+        Q_EMIT busyChanged();
+    }
+}
+
+void TranslationManager::translateDetailed(const QString &text, const QString &fromLang, const QString &toLang)
 {
     if (text.isEmpty()) {
-        return QString();
+        return;
     }
 
-    QString fromCode = getLanguageCode(fromLang);
-    QString toCode = getLanguageCode(toLang);
-    
-    if (toCode.isEmpty()) {
+    if (getLanguageCode(toLang).isEmpty()) {
         Q_EMIT translationError(i18n("Invalid target language"));
-        return QString();
+        return;
     }
 
+    cancelPendingTranslation();
+
+    m_pendingText = text;
+    m_pendingFrom = fromLang;
+    m_pendingTo = toLang;
+    m_translation.clear();
+    m_segments.clear();
+    m_step = TranslationStep::Translation;
+    setBusy(true);
+
+    runStep(buildTransArgs(text, fromLang, toLang, false));
+}
+
+QStringList TranslationManager::buildTransArgs(const QString &text, const QString &fromLang, const QString &toLang, bool dictionaryOnly) const
+{
     QStringList args;
     args << QStringLiteral("-e") << m_translationEngine;
     if (fromLang == i18n("Auto detect")) {
-        args << QStringLiteral(":%1").arg(toCode);
+        args << QStringLiteral(":%1").arg(getLanguageCode(toLang));
     } else {
-        args << QStringLiteral("%1:%2").arg(fromCode, toCode);
+        args << QStringLiteral("%1:%2").arg(getLanguageCode(fromLang), getLanguageCode(toLang));
     }
-    args << text << QStringLiteral("-b");
+    args << text;
 
-    QProcess process;
-    process.start(QStringLiteral("trans"), args);
-    process.waitForFinished();
-
-    if (process.exitCode() == 0) {
-        return QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+    if (dictionaryOnly) {
+        args << QStringLiteral("-no-ansi") << QStringLiteral("-show-original") << QStringLiteral("n") << QStringLiteral("-show-original-phonetics")
+             << QStringLiteral("n") << QStringLiteral("-show-translation") << QStringLiteral("n") << QStringLiteral("-show-translation-phonetics")
+             << QStringLiteral("n") << QStringLiteral("-show-prompt-message") << QStringLiteral("n") << QStringLiteral("-show-languages") << QStringLiteral("n")
+             << QStringLiteral("-show-original-dictionary") << QStringLiteral("n");
     } else {
-        QString error = QString::fromUtf8(process.readAllStandardError());
-        Q_EMIT translationError(error);
-        qDebug() << "Translation error:" << error;
-        return QString();
+        args << QStringLiteral("-b");
     }
+    return args;
 }
 
-QVariantMap TranslationManager::translateDetailed(const QString &text, const QString &fromLang, const QString &toLang)
-{
-    QVariantMap result;
-    QString translation = translate(text, fromLang, toLang);
-    result.insert(QStringLiteral("translation"), translation);
-
-    QVariantList segments;
-    if (!translation.isEmpty() && (m_translationEngine == QStringLiteral("google") || m_translationEngine == QStringLiteral("auto"))) {
-        segments = fetchSegments(text, fromLang, toLang);
-    }
-    result.insert(QStringLiteral("segments"), segments);
-    return result;
-}
-
-QVariantList TranslationManager::fetchSegments(const QString &text, const QString &fromLang, const QString &toLang)
+QVariantList TranslationManager::parseSegments(const QString &output) const
 {
     QVariantList segments;
-    QString fromCode = getLanguageCode(fromLang);
-    QString toCode = getLanguageCode(toLang);
-
-    if (toCode.isEmpty()) {
-        return segments;
-    }
-
-    QStringList args;
-    args << QStringLiteral("-e") << m_translationEngine;
-    if (fromLang == i18n("Auto detect")) {
-        args << QStringLiteral(":%1").arg(toCode);
-    } else {
-        args << QStringLiteral("%1:%2").arg(fromCode, toCode);
-    }
-    args << text << QStringLiteral("-no-ansi") << QStringLiteral("-show-original") << QStringLiteral("n") << QStringLiteral("-show-original-phonetics")
-         << QStringLiteral("n") << QStringLiteral("-show-translation") << QStringLiteral("n") << QStringLiteral("-show-translation-phonetics")
-         << QStringLiteral("n") << QStringLiteral("-show-prompt-message") << QStringLiteral("n") << QStringLiteral("-show-languages") << QStringLiteral("n")
-         << QStringLiteral("-show-original-dictionary") << QStringLiteral("n");
-
-    QProcess process;
-    process.start(QStringLiteral("trans"), args);
-    process.waitForFinished();
-
-    if (process.exitCode() != 0) {
-        return segments;
-    }
-
-    QString output = QString::fromUtf8(process.readAllStandardOutput());
     const QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     for (const QString &line : lines) {
         if (line.startsWith(QLatin1String("    "))) {
@@ -165,6 +145,80 @@ QVariantList TranslationManager::fetchSegments(const QString &text, const QStrin
         }
     }
     return segments;
+}
+
+void TranslationManager::runStep(const QStringList &args)
+{
+    m_currentProcess = new QProcess(this);
+    connect(m_currentProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this](int exitCode) {
+        onStepFinished(exitCode);
+    });
+    connect(m_currentProcess, &QProcess::errorOccurred, this, [this](QProcess::ProcessError) {
+        if (m_currentProcess && m_step != TranslationStep::None) {
+            Q_EMIT translationError(m_currentProcess->errorString());
+            finishTranslation();
+        }
+    });
+    m_currentProcess->start(QStringLiteral("trans"), args);
+}
+
+void TranslationManager::onStepFinished(int exitCode)
+{
+    if (!m_currentProcess || m_step == TranslationStep::None) {
+        return;
+    }
+
+    if (m_step == TranslationStep::Translation) {
+        if (exitCode != 0) {
+            QString error = QString::fromUtf8(m_currentProcess->readAllStandardError());
+            Q_EMIT translationError(error);
+            qDebug() << "Translation error:" << error;
+            finishTranslation();
+            return;
+        }
+
+        m_translation = QString::fromUtf8(m_currentProcess->readAllStandardOutput()).trimmed();
+        if (m_translationEngine == QStringLiteral("google") || m_translationEngine == QStringLiteral("auto")) {
+            m_step = TranslationStep::Segments;
+            m_currentProcess->deleteLater();
+            m_currentProcess = nullptr;
+            runStep(buildTransArgs(m_pendingText, m_pendingFrom, m_pendingTo, true));
+            return;
+        }
+        finishTranslation();
+        return;
+    }
+
+    if (exitCode == 0) {
+        m_segments = parseSegments(QString::fromUtf8(m_currentProcess->readAllStandardOutput()));
+    }
+    finishTranslation();
+}
+
+void TranslationManager::cancelPendingTranslation()
+{
+    if (m_currentProcess) {
+        disconnect(m_currentProcess, nullptr, this, nullptr);
+        m_currentProcess->kill();
+        m_currentProcess->deleteLater();
+        m_currentProcess = nullptr;
+    }
+    m_step = TranslationStep::None;
+}
+
+void TranslationManager::finishTranslation()
+{
+    if (m_currentProcess) {
+        m_currentProcess->deleteLater();
+        m_currentProcess = nullptr;
+    }
+    m_step = TranslationStep::None;
+    setBusy(false);
+
+    QVariantMap result;
+    result.insert(QStringLiteral("translation"), m_translation);
+    result.insert(QStringLiteral("segments"), m_segments);
+    Q_EMIT translationFinished(result);
 }
 
 void TranslationManager::fetchAvailableLanguages()
