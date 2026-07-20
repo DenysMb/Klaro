@@ -13,6 +13,7 @@ class TranslationManager : public QObject
     Q_PROPERTY(bool useEnglishNames READ useEnglishNames WRITE setUseEnglishNames NOTIFY useEnglishNamesChanged)
     Q_PROPERTY(QString inputLanguage READ inputLanguage WRITE setInputLanguage NOTIFY inputLanguageChanged)
     Q_PROPERTY(QString outputLanguage READ outputLanguage WRITE setOutputLanguage NOTIFY outputLanguageChanged)
+    Q_PROPERTY(QString translationEngine READ translationEngine WRITE setTranslationEngine NOTIFY translationEngineChanged)
 
 public:
     struct Language {
@@ -30,6 +31,8 @@ public:
     void setInputLanguage(const QString &language);
     QString outputLanguage() const;
     void setOutputLanguage(const QString &language);
+    QString translationEngine() const;
+    void setTranslationEngine(const QString &engine);
 
     Q_INVOKABLE QString translate(const QString &text, const QString &fromLang, const QString &toLang);
     Q_INVOKABLE bool copyToClipboard(const QString &text);
@@ -40,6 +43,7 @@ Q_SIGNALS:
     void translationError(const QString &error);
     void inputLanguageChanged();
     void outputLanguageChanged();
+    void translationEngineChanged();
 
 private:
     void fetchAvailableLanguages();
@@ -53,6 +57,7 @@ private:
     bool m_useEnglishNames = false;
     QString m_inputLanguage;
     QString m_outputLanguage;
+    QString m_translationEngine;
 };
 
 #endif // TRANSLATIONMANAGER_H 

@@ -8,6 +8,12 @@
 #include <QStandardPaths>
 #include <QDir>
 
+namespace
+{
+const QStringList s_availableEngines = {QStringLiteral("auto"), QStringLiteral("google"), QStringLiteral("bing"), QStringLiteral("yandex")};
+const QString s_defaultEngine = QStringLiteral("auto");
+}
+
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
     , m_process(new QProcess(this))
@@ -76,6 +82,7 @@ QString TranslationManager::translate(const QString &text, const QString &fromLa
     }
 
     QStringList args;
+    args << QStringLiteral("-e") << m_translationEngine;
     if (fromLang == i18n("Auto detect")) {
         args << QStringLiteral(":%1").arg(toCode);
     } else {
@@ -158,6 +165,20 @@ void TranslationManager::setOutputLanguage(const QString &language)
     }
 }
 
+QString TranslationManager::translationEngine() const
+{
+    return m_translationEngine;
+}
+
+void TranslationManager::setTranslationEngine(const QString &engine)
+{
+    if (m_translationEngine != engine && s_availableEngines.contains(engine)) {
+        m_translationEngine = engine;
+        saveSettings();
+        Q_EMIT translationEngineChanged();
+    }
+}
+
 void TranslationManager::loadSettings()
 {
     // Create the config directory if it doesn't exist
@@ -176,8 +197,11 @@ void TranslationManager::loadSettings()
     m_inputLanguage = settings.value(QStringLiteral("translation/inputLanguage"), i18n("Auto detect")).toString();
     m_outputLanguage = settings.value(QStringLiteral("translation/outputLanguage"), QStringLiteral("English")).toString();
     m_useEnglishNames = settings.value(QStringLiteral("translation/useEnglishNames"), false).toBool();
-    
-    qDebug() << QStringLiteral("Loaded settings - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage << QStringLiteral("useEnglishNames:") << m_useEnglishNames;
+    QString engine = settings.value(QStringLiteral("translation/engine"), s_defaultEngine).toString();
+    m_translationEngine = s_availableEngines.contains(engine) ? engine : s_defaultEngine;
+
+    qDebug() << QStringLiteral("Loaded settings - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage
+             << QStringLiteral("useEnglishNames:") << m_useEnglishNames << QStringLiteral("engine:") << m_translationEngine;
 }
 
 void TranslationManager::saveSettings()
@@ -198,7 +222,8 @@ void TranslationManager::saveSettings()
     settings.setValue(QStringLiteral("translation/inputLanguage"), m_inputLanguage);
     settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
     settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
-    
+    settings.setValue(QStringLiteral("translation/engine"), m_translationEngine);
+
     // Force sync to ensure data is written immediately
     settings.sync();
     

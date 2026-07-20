@@ -103,8 +103,45 @@ Kirigami.ApplicationWindow {
                 checkable: true
                 checked: TranslationManager.useEnglishNames
                 onTriggered: TranslationManager.useEnglishNames = checked
+            },
+            Kirigami.Action {
+                text: i18n("Translation engine")
+                icon.name: "applications-internet"
+
+                Kirigami.Action {
+                    text: i18n("Auto")
+                    checkable: true
+                    checked: TranslationManager.translationEngine === "auto"
+                    Controls.ActionGroup.group: engineActionGroup
+                    onTriggered: TranslationManager.translationEngine = "auto"
+                }
+                Kirigami.Action {
+                    text: i18n("Google")
+                    checkable: true
+                    checked: TranslationManager.translationEngine === "google"
+                    Controls.ActionGroup.group: engineActionGroup
+                    onTriggered: TranslationManager.translationEngine = "google"
+                }
+                Kirigami.Action {
+                    text: i18n("Bing")
+                    checkable: true
+                    checked: TranslationManager.translationEngine === "bing"
+                    Controls.ActionGroup.group: engineActionGroup
+                    onTriggered: TranslationManager.translationEngine = "bing"
+                }
+                Kirigami.Action {
+                    text: i18n("Yandex")
+                    checkable: true
+                    checked: TranslationManager.translationEngine === "yandex"
+                    Controls.ActionGroup.group: engineActionGroup
+                    onTriggered: TranslationManager.translationEngine = "yandex"
+                }
             }
         ]
+    }
+
+    Controls.ActionGroup {
+        id: engineActionGroup
     }
 
     // Language dialog component
