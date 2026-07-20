@@ -1,14 +1,14 @@
 # Klaro translations.
-# Copyright (C) 2025 Klaro contributors
+# Copyright (C) 2026 Klaro contributors
 # This file is distributed under the same license as the Klaro package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Klaro 1.0.0\n"
+"Project-Id-Version: Klaro 1.0.1\n"
 "Report-Msgid-Bugs-To: https://github.com/DenysMb/Klaro \n"
-"POT-Creation-Date: 2025-05-24 10:13+0100\n"
+"POT-Creation-Date: 2026-07-20 14:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: io.github.denysmb.klaro.desktop:3
+#: io.github.denysmb.klaro.desktop:2
 msgid "Klaro"
 msgstr ""
 
-#: io.github.denysmb.klaro.desktop:4
+#: io.github.denysmb.klaro.desktop:3
 msgid "Translation application"
 msgstr ""
 
@@ -37,71 +37,101 @@ msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr ""
 
-#: src/qml/Main.qml:53
+#: src/qml/Main.qml:57
 #, kde-format
 msgctxt "@title:window"
 msgid "Klaro"
 msgstr ""
 
-#: src/qml/Main.qml:59 src/qml/Main.qml:197
+#: src/qml/Main.qml:63 src/qml/Main.qml:238
 #, kde-format
 msgid "Change language"
 msgstr ""
 
-#: src/qml/Main.qml:64 src/qml/Main.qml:205
+#: src/qml/Main.qml:68 src/qml/Main.qml:246
 #, kde-format
 msgid "Translate"
 msgstr ""
 
-#: src/qml/Main.qml:69 src/qml/Main.qml:172
+#: src/qml/Main.qml:73 src/qml/Main.qml:213
 #, kde-format
 msgid "Switch languages"
 msgstr ""
 
-#: src/qml/Main.qml:71 src/qml/Main.qml:74 src/qml/Main.qml:160
-#: src/qml/Main.qml:174 src/qml/Main.qml:177 src/translationmanager.cpp:39
-#: src/translationmanager.cpp:51 src/translationmanager.cpp:79
-#: src/translationmanager.cpp:111 src/translationmanager.cpp:176
+#: src/qml/Main.qml:75 src/qml/Main.qml:78 src/qml/Main.qml:201
+#: src/qml/Main.qml:215 src/qml/Main.qml:218 src/translationmanager.cpp:45
+#: src/translationmanager.cpp:57 src/translationmanager.cpp:86
+#: src/translationmanager.cpp:118 src/translationmanager.cpp:197
 #, kde-format
 msgid "Auto detect"
 msgstr ""
 
-#: src/qml/Main.qml:97
+#: src/qml/Main.qml:101
 #, kde-format
 msgid "Use English language names"
 msgstr ""
 
-#: src/qml/Main.qml:109
+#: src/qml/Main.qml:108
+#, kde-format
+msgid "Translation engine"
+msgstr ""
+
+#: src/qml/Main.qml:112
+#, kde-format
+msgid "Auto"
+msgstr ""
+
+#: src/qml/Main.qml:119
+#, kde-format
+msgid "Google"
+msgstr ""
+
+#: src/qml/Main.qml:126
+#, kde-format
+msgid "Bing"
+msgstr ""
+
+#: src/qml/Main.qml:133
+#, kde-format
+msgid "Yandex"
+msgstr ""
+
+#: src/qml/Main.qml:150
 #, kde-format
 msgid "Select Languages"
 msgstr ""
 
-#: src/qml/Main.qml:149
+#: src/qml/Main.qml:190
 #, kde-format
 msgid "Input Language:"
 msgstr ""
 
-#: src/qml/Main.qml:159
+#: src/qml/Main.qml:200
 #, kde-format
 msgid "Output Language:"
 msgstr ""
 
-#: src/qml/Main.qml:239
+#: src/qml/Main.qml:280
 #, kde-format
 msgid "Translated text will appear here"
 msgstr ""
 
-#: src/qml/Main.qml:251
+#: src/qml/Main.qml:292
 #, kde-format
 msgid "Copy"
 msgstr ""
 
-#: src/qml/Main.qml:291
+#: src/qml/Main.qml:343
 #, kde-format
 msgid "Enter text to translate"
 msgstr ""
 
-#: src/translationmanager.cpp:74
+#: src/qml/Main.qml:355
+#, kde-format
+msgid "Clear"
+msgstr ""
+
+#: src/translationmanager.cpp:80
 #, kde-format
 msgid "Invalid target language"
 msgstr ""
