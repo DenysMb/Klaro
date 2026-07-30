@@ -16,7 +16,6 @@ Kirigami.ApplicationWindow {
     property string selectedInputLanguage: TranslationManager.inputLanguage
     property string selectedOutputLanguage: TranslationManager.outputLanguage
     property var translationSegments: []
-    property bool alternativesExpanded: false
 
     function countWords(text) {
         return text.trim() === "" ? 0 : text.trim().split(/\s+/).length
@@ -213,6 +212,41 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    // Alternatives dialog component
+    Kirigami.Dialog {
+        id: alternativesDialog
+        title: i18n("Alternatives")
+        standardButtons: Kirigami.Dialog.Close
+        preferredWidth: Kirigami.Units.gridUnit * 25
+        padding: Kirigami.Units.largeSpacing
+
+        ListView {
+            id: alternativesList
+            implicitHeight: Math.min(contentHeight, Kirigami.Units.gridUnit * 15)
+            clip: true
+            model: root.translationSegments
+            spacing: Kirigami.Units.smallSpacing
+
+            delegate: Column {
+                width: alternativesList.width
+
+                Controls.Label {
+                    width: parent.width
+                    text: modelData.segment
+                    wrapMode: Text.WordWrap
+                    font.bold: true
+                }
+                Controls.Label {
+                    width: parent.width
+                    leftPadding: Kirigami.Units.largeSpacing
+                    text: modelData.alternatives.join(", ")
+                    wrapMode: Text.WordWrap
+                    opacity: 0.7
+                }
+            }
+        }
+    }
+
     // Set the first page that will be loaded when the app opens
     // This can also be set to an id of a Kirigami.Page
     pageStack.initialPage: Kirigami.Page {
@@ -271,63 +305,23 @@ Kirigami.ApplicationWindow {
                 width: parent.width
                 height: parent.height / 2 - Kirigami.Units.largeSpacing
                 
-                contentItem: ColumnLayout {
-                    anchors.fill: parent
-                    spacing: Kirigami.Units.smallSpacing
-
-                    Controls.Label {
-                        id: translatedTextLabel
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        text: ""
-                        wrapMode: Text.WordWrap
-                        elide: Text.ElideRight
-                        verticalAlignment: Text.AlignTop
-                        opacity: text === "" ? 0.6 : 1.0
-                        
-                        // Show placeholder text when empty
-                        Kirigami.PlaceholderMessage {
-                            anchors.centerIn: parent
-                            width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                            visible: translatedTextLabel.text === ""
-                            text: i18n("Translated text will appear here")
-                        }
-                    }
-
-                    Controls.ToolButton {
-                        Layout.fillWidth: true
-                        visible: root.translationSegments.length > 0
-                        text: i18n("Alternatives")
-                        icon.name: root.alternativesExpanded ? "go-up" : "go-down"
-                        onClicked: root.alternativesExpanded = !root.alternativesExpanded
-                    }
-
-                    ListView {
-                        id: alternativesList
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: Math.min(contentHeight, parent.height / 2)
-                        visible: root.alternativesExpanded && root.translationSegments.length > 0
-                        clip: true
-                        model: root.translationSegments
-                        spacing: Kirigami.Units.smallSpacing
-
-                        delegate: Column {
-                            width: alternativesList.width
-
-                            Controls.Label {
-                                width: parent.width
-                                text: modelData.segment
-                                wrapMode: Text.WordWrap
-                                font.bold: true
-                            }
-                            Controls.Label {
-                                width: parent.width
-                                leftPadding: Kirigami.Units.largeSpacing
-                                text: modelData.alternatives.join(", ")
-                                wrapMode: Text.WordWrap
-                                opacity: 0.7
-                            }
-                        }
+                contentItem: Controls.Label {
+                    id: translatedTextLabel
+                    width: parent.width
+                    height: parent.height
+                    anchors.margins: Kirigami.Units.smallSpacing
+                    text: ""
+                    wrapMode: Text.WordWrap
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignTop
+                    opacity: text === "" ? 0.6 : 1.0
+                    
+                    // Show placeholder text when empty
+                    Kirigami.PlaceholderMessage {
+                        anchors.centerIn: parent
+                        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                        visible: translatedTextLabel.text === ""
+                        text: i18n("Translated text will appear here")
                     }
                 }
             }
@@ -355,11 +349,24 @@ Kirigami.ApplicationWindow {
                 running: visible
             }
 
+            Controls.ToolButton {
+                anchors {
+                    left: translatedCard.left
+                    bottom: translatedCard.bottom
+                    margins: Kirigami.Units.smallSpacing
+                }
+                icon.name: "view-list-details"
+                text: i18n("Alternatives")
+                display: Controls.ToolButton.IconOnly
+                visible: root.translationSegments.length > 0
+                onClicked: alternativesDialog.open()
+            }
+
             Controls.Label {
                 anchors {
                     bottom: translatedCard.bottom
                     right: translatedCard.right
-                    margins: Kirigami.Units.smallSpacing
+                    margins: Kirigami.Units.largeSpacing
                 }
                 visible: translatedTextLabel.text !== ""
                 text: translatedTextLabel.text.length + " chars · " + root.countWords(translatedTextLabel.text) + " words"
@@ -422,7 +429,7 @@ Kirigami.ApplicationWindow {
                 anchors {
                     bottom: inputCard.bottom
                     right: inputCard.right
-                    margins: Kirigami.Units.smallSpacing
+                    margins: Kirigami.Units.largeSpacing
                 }
                 visible: inputTextArea.text !== ""
                 text: inputTextArea.text.length + " chars · " + root.countWords(inputTextArea.text) + " words"
