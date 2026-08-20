@@ -3,6 +3,7 @@
 #include <QClipboard>
 #include <QDebug>
 #include <QDir>
+#include <QFont>
 #include <QGuiApplication>
 #include <QRegularExpression>
 #include <QSettings>
@@ -57,6 +58,21 @@ void TranslationManager::setAutoFocusOnLaunch(bool value)
         m_autoFocusOnLaunch = value;
         saveSettings();
         Q_EMIT autoFocusOnLaunchChanged();
+    }
+}
+
+int TranslationManager::fontSize() const
+{
+    return m_fontSize;
+}
+
+void TranslationManager::setFontSize(int value)
+{
+    const int clampedValue = qBound(8, value, 32);
+    if (m_fontSize != clampedValue) {
+        m_fontSize = clampedValue;
+        saveSettings();
+        Q_EMIT fontSizeChanged();
     }
 }
 
@@ -191,6 +207,8 @@ void TranslationManager::loadSettings()
     m_outputLanguage = settings.value(QStringLiteral("translation/outputLanguage"), QStringLiteral("English")).toString();
     m_useEnglishNames = settings.value(QStringLiteral("translation/useEnglishNames"), false).toBool();
     m_autoFocusOnLaunch = settings.value(QStringLiteral("ui/autoFocusOnLaunch"), true).toBool();
+    const int systemFontSize = QGuiApplication::font().pointSize();
+    m_fontSize = qBound(8, settings.value(QStringLiteral("ui/fontSize"), systemFontSize > 0 ? systemFontSize : 10).toInt(), 32);
 
     qDebug() << QStringLiteral("Loaded settings - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage << QStringLiteral("useEnglishNames:") << m_useEnglishNames;
 }
@@ -214,6 +232,7 @@ void TranslationManager::saveSettings()
     settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
     settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
     settings.setValue(QStringLiteral("ui/autoFocusOnLaunch"), m_autoFocusOnLaunch);
+    settings.setValue(QStringLiteral("ui/fontSize"), m_fontSize);
 
     // Force sync to ensure data is written immediately
     settings.sync();
