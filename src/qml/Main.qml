@@ -114,11 +114,6 @@ Kirigami.ApplicationWindow {
                 separator: true
             },
             Kirigami.Action {
-                text: i18n("Font size...")
-                icon.name: "font-select-symbolic"
-                onTriggered: fontSizeDialog.open()
-            },
-            Kirigami.Action {
                 text: i18n("Increase font size")
                 icon.name: "font-size-up-symbolic"
                 shortcut: "Ctrl++"
@@ -190,39 +185,6 @@ Kirigami.ApplicationWindow {
     }
 
     // Language dialog component
-    Kirigami.Dialog {
-        id: fontSizeDialog
-        title: i18n("Font Size")
-        standardButtons: Kirigami.Dialog.Close
-        padding: Kirigami.Units.largeSpacing
-        preferredWidth: Kirigami.Units.gridUnit * 18
-
-        Kirigami.FormLayout {
-            Layout.fillWidth: true
-
-            Controls.Slider {
-                id: fontSizeSlider
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Size:")
-                from: 8
-                to: 32
-                stepSize: 1
-                value: TranslationManager.fontSize
-                onMoved: TranslationManager.fontSize = value
-            }
-
-            Controls.Label {
-                text: i18n("Current: %1pt", TranslationManager.fontSize)
-            }
-
-            Controls.Button {
-                text: i18n("Reset to default")
-                icon.name: "zoom-original"
-                onClicked: TranslationManager.fontSize = Kirigami.Theme.defaultFont.pointSize
-            }
-        }
-    }
-
     Kirigami.Dialog {
         id: languageDialog
         title: i18n("Select Languages")
