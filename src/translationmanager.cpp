@@ -1,12 +1,12 @@
 #include "translationmanager.h"
-#include <QDebug>
 #include <KLocalizedString>
+#include <QClipboard>
+#include <QDebug>
+#include <QDir>
+#include <QGuiApplication>
 #include <QRegularExpression>
 #include <QSettings>
-#include <QClipboard>
-#include <QGuiApplication>
 #include <QStandardPaths>
-#include <QDir>
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -43,6 +43,20 @@ void TranslationManager::setUseEnglishNames(bool value)
         }
         
         Q_EMIT availableLanguagesChanged();
+    }
+}
+
+bool TranslationManager::autoFocusOnLaunch() const
+{
+    return m_autoFocusOnLaunch;
+}
+
+void TranslationManager::setAutoFocusOnLaunch(bool value)
+{
+    if (m_autoFocusOnLaunch != value) {
+        m_autoFocusOnLaunch = value;
+        saveSettings();
+        Q_EMIT autoFocusOnLaunchChanged();
     }
 }
 
@@ -176,7 +190,8 @@ void TranslationManager::loadSettings()
     m_inputLanguage = settings.value(QStringLiteral("translation/inputLanguage"), i18n("Auto detect")).toString();
     m_outputLanguage = settings.value(QStringLiteral("translation/outputLanguage"), QStringLiteral("English")).toString();
     m_useEnglishNames = settings.value(QStringLiteral("translation/useEnglishNames"), false).toBool();
-    
+    m_autoFocusOnLaunch = settings.value(QStringLiteral("ui/autoFocusOnLaunch"), true).toBool();
+
     qDebug() << QStringLiteral("Loaded settings - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage << QStringLiteral("useEnglishNames:") << m_useEnglishNames;
 }
 
@@ -198,7 +213,8 @@ void TranslationManager::saveSettings()
     settings.setValue(QStringLiteral("translation/inputLanguage"), m_inputLanguage);
     settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
     settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
-    
+    settings.setValue(QStringLiteral("ui/autoFocusOnLaunch"), m_autoFocusOnLaunch);
+
     // Force sync to ensure data is written immediately
     settings.sync();
     

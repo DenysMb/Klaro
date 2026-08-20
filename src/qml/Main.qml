@@ -20,6 +20,15 @@ Kirigami.ApplicationWindow {
         // Initial values will be loaded from settings
         selectedInputLanguage = TranslationManager.inputLanguage
         selectedOutputLanguage = TranslationManager.outputLanguage
+        Qt.callLater(focusInput)
+    }
+
+    onActiveChanged: focusInput()
+
+    function focusInput() {
+        if (active && TranslationManager.autoFocusOnLaunch) {
+            inputTextArea.forceActiveFocus()
+        }
     }
 
     onSelectedInputLanguageChanged: TranslationManager.inputLanguage = selectedInputLanguage
@@ -92,6 +101,13 @@ Kirigami.ApplicationWindow {
             },
             Kirigami.Action {
                 separator: true
+            },
+            Kirigami.Action {
+                text: i18n("Auto-focus input on launch")
+                icon.name: "input-keyboard"
+                checkable: true
+                checked: TranslationManager.autoFocusOnLaunch
+                onTriggered: TranslationManager.autoFocusOnLaunch = checked
             },
             Kirigami.Action {
                 text: i18n("Use English language names")

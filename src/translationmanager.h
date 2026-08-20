@@ -11,6 +11,7 @@ class TranslationManager : public QObject
     Q_OBJECT
     Q_PROPERTY(QStringList availableLanguages READ availableLanguages NOTIFY availableLanguagesChanged)
     Q_PROPERTY(bool useEnglishNames READ useEnglishNames WRITE setUseEnglishNames NOTIFY useEnglishNamesChanged)
+    Q_PROPERTY(bool autoFocusOnLaunch READ autoFocusOnLaunch WRITE setAutoFocusOnLaunch NOTIFY autoFocusOnLaunchChanged)
     Q_PROPERTY(QString inputLanguage READ inputLanguage WRITE setInputLanguage NOTIFY inputLanguageChanged)
     Q_PROPERTY(QString outputLanguage READ outputLanguage WRITE setOutputLanguage NOTIFY outputLanguageChanged)
 
@@ -25,6 +26,8 @@ public:
     QStringList availableLanguages() const;
     bool useEnglishNames() const;
     void setUseEnglishNames(bool value);
+    bool autoFocusOnLaunch() const;
+    void setAutoFocusOnLaunch(bool value);
 
     QString inputLanguage() const;
     void setInputLanguage(const QString &language);
@@ -38,6 +41,7 @@ Q_SIGNALS:
     void availableLanguagesChanged();
     void useEnglishNamesChanged();
     void translationError(const QString &error);
+    void autoFocusOnLaunchChanged();
     void inputLanguageChanged();
     void outputLanguageChanged();
 
@@ -51,6 +55,7 @@ private:
     QMap<QString, Language> m_languageMap;
     QProcess *m_process;
     bool m_useEnglishNames = false;
+    bool m_autoFocusOnLaunch = true;
     QString m_inputLanguage;
     QString m_outputLanguage;
 };
