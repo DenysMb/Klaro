@@ -24,7 +24,15 @@ Kirigami.ApplicationWindow {
     Component.onCompleted: {
         selectedInputLanguage = TranslationManager.inputLanguage
         selectedOutputLanguage = TranslationManager.outputLanguage
-        inputTextArea.forceActiveFocus()
+        Qt.callLater(focusInput)
+    }
+
+    onActiveChanged: focusInput()
+
+    function focusInput() {
+        if (active && TranslationManager.autoFocusOnLaunch) {
+            inputTextArea.forceActiveFocus()
+        }
     }
 
     onSelectedInputLanguageChanged: TranslationManager.inputLanguage = selectedInputLanguage
@@ -106,6 +114,35 @@ Kirigami.ApplicationWindow {
                 separator: true
             },
             Kirigami.Action {
+                text: i18n("Font size...")
+                icon.name: "font-select-symbolic"
+                onTriggered: fontSizeDialog.open()
+            },
+            Kirigami.Action {
+                text: i18n("Increase font size")
+                icon.name: "font-size-up-symbolic"
+                shortcut: "Ctrl++"
+                enabled: TranslationManager.fontSize < 32
+                onTriggered: TranslationManager.fontSize = TranslationManager.fontSize + 1
+            },
+            Kirigami.Action {
+                text: i18n("Decrease font size")
+                icon.name: "font-size-down-symbolic"
+                shortcut: "Ctrl+-"
+                enabled: TranslationManager.fontSize > 8
+                onTriggered: TranslationManager.fontSize = TranslationManager.fontSize - 1
+            },
+            Kirigami.Action {
+                separator: true
+            },
+            Kirigami.Action {
+                text: i18n("Auto-focus input on launch")
+                icon.name: "input-keyboard"
+                checkable: true
+                checked: TranslationManager.autoFocusOnLaunch
+                onTriggered: TranslationManager.autoFocusOnLaunch = checked
+            },
+            Kirigami.Action {
                 text: i18n("Use English language names")
                 icon.name: "preferences-desktop-locale"
                 checkable: true
@@ -153,6 +190,39 @@ Kirigami.ApplicationWindow {
     }
 
     // Language dialog component
+    Kirigami.Dialog {
+        id: fontSizeDialog
+        title: i18n("Font Size")
+        standardButtons: Kirigami.Dialog.Close
+        padding: Kirigami.Units.largeSpacing
+        preferredWidth: Kirigami.Units.gridUnit * 18
+
+        Kirigami.FormLayout {
+            Layout.fillWidth: true
+
+            Controls.Slider {
+                id: fontSizeSlider
+                Layout.fillWidth: true
+                Kirigami.FormData.label: i18n("Size:")
+                from: 8
+                to: 32
+                stepSize: 1
+                value: TranslationManager.fontSize
+                onMoved: TranslationManager.fontSize = value
+            }
+
+            Controls.Label {
+                text: i18n("Current: %1pt", TranslationManager.fontSize)
+            }
+
+            Controls.Button {
+                text: i18n("Reset to default")
+                icon.name: "zoom-original"
+                onClicked: TranslationManager.fontSize = Kirigami.Theme.defaultFont.pointSize
+            }
+        }
+    }
+
     Kirigami.Dialog {
         id: languageDialog
         title: i18n("Select Languages")
@@ -311,6 +381,7 @@ Kirigami.ApplicationWindow {
                     height: parent.height
                     anchors.margins: Kirigami.Units.smallSpacing
                     text: ""
+                    font.pointSize: TranslationManager.fontSize
                     wrapMode: Text.WordWrap
                     elide: Text.ElideRight
                     verticalAlignment: Text.AlignTop
@@ -386,6 +457,7 @@ Kirigami.ApplicationWindow {
                     height: parent.height / 2 - Kirigami.Units.largeSpacing
                     wrapMode: TextEdit.Wrap
                     background: null
+                    font.pointSize: TranslationManager.fontSize
                     opacity: text === "" ? 0.6 : 1.0
 
                     Keys.onReturnPressed: {

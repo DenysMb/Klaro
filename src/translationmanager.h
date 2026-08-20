@@ -13,6 +13,8 @@ class TranslationManager : public QObject
     Q_OBJECT
     Q_PROPERTY(QStringList availableLanguages READ availableLanguages NOTIFY availableLanguagesChanged)
     Q_PROPERTY(bool useEnglishNames READ useEnglishNames WRITE setUseEnglishNames NOTIFY useEnglishNamesChanged)
+    Q_PROPERTY(bool autoFocusOnLaunch READ autoFocusOnLaunch WRITE setAutoFocusOnLaunch NOTIFY autoFocusOnLaunchChanged)
+    Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize NOTIFY fontSizeChanged)
     Q_PROPERTY(QString inputLanguage READ inputLanguage WRITE setInputLanguage NOTIFY inputLanguageChanged)
     Q_PROPERTY(QString outputLanguage READ outputLanguage WRITE setOutputLanguage NOTIFY outputLanguageChanged)
     Q_PROPERTY(QString translationEngine READ translationEngine WRITE setTranslationEngine NOTIFY translationEngineChanged)
@@ -29,6 +31,10 @@ public:
     QStringList availableLanguages() const;
     bool useEnglishNames() const;
     void setUseEnglishNames(bool value);
+    bool autoFocusOnLaunch() const;
+    void setAutoFocusOnLaunch(bool value);
+    int fontSize() const;
+    void setFontSize(int value);
 
     QString inputLanguage() const;
     void setInputLanguage(const QString &language);
@@ -46,6 +52,8 @@ Q_SIGNALS:
     void useEnglishNamesChanged();
     void translationError(const QString &error);
     void translationFinished(const QVariantMap &result);
+    void autoFocusOnLaunchChanged();
+    void fontSizeChanged();
     void inputLanguageChanged();
     void outputLanguageChanged();
     void translationEngineChanged();
@@ -82,6 +90,8 @@ private:
     QVariantList m_segments;
     bool m_useEnglishNames = false;
     bool m_busy = false;
+    bool m_autoFocusOnLaunch = true;
+    int m_fontSize = 10;
     QString m_inputLanguage;
     QString m_outputLanguage;
     QString m_translationEngine;

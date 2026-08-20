@@ -1,12 +1,13 @@
 #include "translationmanager.h"
-#include <QDebug>
 #include <KLocalizedString>
+#include <QClipboard>
+#include <QDebug>
+#include <QDir>
+#include <QFont>
+#include <QGuiApplication>
 #include <QRegularExpression>
 #include <QSettings>
-#include <QClipboard>
-#include <QGuiApplication>
 #include <QStandardPaths>
-#include <QDir>
 
 namespace
 {
@@ -49,6 +50,35 @@ void TranslationManager::setUseEnglishNames(bool value)
         }
         
         Q_EMIT availableLanguagesChanged();
+    }
+}
+
+bool TranslationManager::autoFocusOnLaunch() const
+{
+    return m_autoFocusOnLaunch;
+}
+
+void TranslationManager::setAutoFocusOnLaunch(bool value)
+{
+    if (m_autoFocusOnLaunch != value) {
+        m_autoFocusOnLaunch = value;
+        saveSettings();
+        Q_EMIT autoFocusOnLaunchChanged();
+    }
+}
+
+int TranslationManager::fontSize() const
+{
+    return m_fontSize;
+}
+
+void TranslationManager::setFontSize(int value)
+{
+    const int clampedValue = qBound(8, value, 32);
+    if (m_fontSize != clampedValue) {
+        m_fontSize = clampedValue;
+        saveSettings();
+        Q_EMIT fontSizeChanged();
     }
 }
 
@@ -316,6 +346,9 @@ void TranslationManager::loadSettings()
     m_useEnglishNames = settings.value(QStringLiteral("translation/useEnglishNames"), false).toBool();
     QString engine = settings.value(QStringLiteral("translation/engine"), s_defaultEngine).toString();
     m_translationEngine = s_availableEngines.contains(engine) ? engine : s_defaultEngine;
+    m_autoFocusOnLaunch = settings.value(QStringLiteral("ui/autoFocusOnLaunch"), true).toBool();
+    const int systemFontSize = QGuiApplication::font().pointSize();
+    m_fontSize = qBound(8, settings.value(QStringLiteral("ui/fontSize"), systemFontSize > 0 ? systemFontSize : 10).toInt(), 32);
 
     qDebug() << QStringLiteral("Loaded settings - input:") << m_inputLanguage << QStringLiteral("output:") << m_outputLanguage
              << QStringLiteral("useEnglishNames:") << m_useEnglishNames << QStringLiteral("engine:") << m_translationEngine;
@@ -340,6 +373,8 @@ void TranslationManager::saveSettings()
     settings.setValue(QStringLiteral("translation/outputLanguage"), m_outputLanguage);
     settings.setValue(QStringLiteral("translation/useEnglishNames"), m_useEnglishNames);
     settings.setValue(QStringLiteral("translation/engine"), m_translationEngine);
+    settings.setValue(QStringLiteral("ui/autoFocusOnLaunch"), m_autoFocusOnLaunch);
+    settings.setValue(QStringLiteral("ui/fontSize"), m_fontSize);
 
     // Force sync to ensure data is written immediately
     settings.sync();
